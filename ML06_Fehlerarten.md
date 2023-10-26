@@ -21,4 +21,6 @@ Wann ist dies notwendig?
 
 Lösung ist sich die Genauigkeit ein wenig spezifischer zu betrachten.
 
+![TruePositive](pictures/Fehlerarten01.jpg)
+
 
