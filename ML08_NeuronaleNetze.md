@@ -185,3 +185,12 @@ model.fit(X.astype(np.float32), y, batch_size = 1, epochs = 1)
 53940/53940 [==============================] - 56s 1ms/step - loss: 30607938.0000
 <tensorflow.python.keras.callbacks.History at 0x7fd784452590>
 ```
+
+Danach kann man wieder ein predict durchführen
+```python
+model.predict(np.array([
+    [0.1]
+]))
+
+array([[74.41793]], dtype=float32)
+```
