@@ -150,4 +150,38 @@ Das einzelne Neuron wird durch das Model erzeugt und die Anzahl der Eingabedaten
 
 ## Neuron trainieren
 
+Zuerst die X und y-Daten vorbereiten
+```python
+X = df[["carat"]]
+y = df["price"]
+```
 
+Mit model.weights erhält man die Gewichte
+```python
+print(model.weights)
+```
+
+Damit das Model die Gewichte lernt und nicht nur zufällig initialisiert, muss das Model compiliert werden
+```python
+model.compile(
+    optimizer = keras.optimizers.RMSprop(),
+    loss = keras.losses.MeanSquaredError()
+)
+```
+
+Bevor wir das Model fitten können müssen noch die X-Daten auf float32 umgewandelt werden.<br>
+Wir sehen uns mal die X-Daten an
+```python
+#print(X)
+#print(X.to_numpy())
+print(X.to_numpy().dtype)
+```
+
+Neuronales Netz will mit float32 rechnen -> schneller<br>
+Das folgende fitten dauert einige Zeit
+```python
+model.fit(X.astype(np.float32), y, batch_size = 1, epochs = 1)
+
+53940/53940 [==============================] - 56s 1ms/step - loss: 30607938.0000
+<tensorflow.python.keras.callbacks.History at 0x7fd784452590>
+```
