@@ -26,7 +26,7 @@ Analogie mit Nervenzellen:<br>
 
 Analogie ist wahrscheinlich nicht ganz richtig. NN ist viel angewandte Mathematik.
 
-Mathematik:
+Mathematik:<br>
 ![NeuronaleNetze02](pictures/NeuronaleNetze02.jpg)
 
 entspricht der linearen Regression, aber in einer etwas anderen Schreibweise
@@ -37,6 +37,14 @@ Man versucht die Gewichte und das Bias zu optimieren, damit das Neuron die entsp
 
 ## Wie lernt ein einzelnes Neuron
 
+- Die idealen Gewichte vom Neuron können in einem Neuronalen Netz nicht direkt durch eine mathematische Formel ermittelt werden
+- Wir müssen uns ihnen daher Schritt für Schritt annähern
+- Idee:
+  - Wir initialisieren die Gewichte zufällig
+  - Wir schauen uns dann die Datensätze einzeln an
+  - Und dann verändern wir die Gewichte ein wenig in die "richtige Richtung"
+
+![NeuronaleNetze03](pictures/NeuronaleNetze03.jpg)
 
 
 
