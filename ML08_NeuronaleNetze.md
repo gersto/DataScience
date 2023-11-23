@@ -1,4 +1,4 @@
-# Neuronale Netze
+# Neuronale Netze (ein einzelnes Neuron)
 
 ## Einführung: Neuronale Netze
 
@@ -317,5 +317,18 @@ model.predict(np.array([
 array([[0.24642956]], dtype=float32)
 ```
 
+# Neuronale Netze (vom Neuron zm Netz)
+
+## Vom Neuron zum Netz (Backpropagation)
+
+- Idee:
+  - Wir "schieben" eine Schicht von Neuronen zwischen die Eingabe und unseren Ausgabe-Knoten
+  - Hierbei sind alle Knoten der neuen Schicht mit allen Knoten der vorherigen Schicht verbunden
+- Hierbei wir unterschieden:
+  - Input-Layer
+  - Hidden-Layer
+  - Output-Layer
+ 
+![NeuronaleNetze05](pictures/NeuronaleNetze05.jpg)
 
 
