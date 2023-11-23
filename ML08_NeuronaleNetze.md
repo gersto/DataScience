@@ -202,4 +202,39 @@ Das einzelne Neuron hat zwar gelernt, aber noch nicht so richtig gut:
   model.fit(X.astype(np.float32), y, batch_size = 1, epochs = 10)
   ```
   dauert sehr lange, ist also relativ ineffizient
-- Änderung der batch_size 
+- Änderung der batch_size --> es werden dann viele Ergebnisse auf einmal berechnet und dann nur einmal an den Gewichten gedreht
+  (sollte auch von den Prozessoren - Paraellelverarbeitung - unterstützt werden) --> geht dann viel schneller
+  ```python
+  model.fit(X.astype(np.float32), y, batch_size = 64, epochs = 10)
+  ```
+
+Dieses neuronale Netz macht aber noch immer keine guten Vorhersagen - der berechnete **loss** über den MeanSquareError (auch in der Ausgabe)
+ändert sich nicht sehr. D.h. wir drehen nur sehr schwach an unseren Geichten, d.h. wir bräuchten sehr, sehr viele Epochen um den Fehler auszugleichen.<br>
+Dafür gibt es die Lernrate (gibt an wie stark wir an den Gewichten drehen sollen) - kann über den optimizer als Parameter beeinflusst werden. 
+```python
+model.compile(
+    optimizer = keras.optimizers.RMSprop(learning_rate=0.5),
+    loss = keras.losses.MeanSquaredError()
+)
+
+model.fit(X.astype(np.float32), y, batch_size = 64, epochs = 10)
+
+model.predict(np.array([
+    [0.7]
+]))
+```
+Bei zu großer Learning-Rate (z.B. 100) ergibt sich auch kein gutes loss-Verhalten
+
+Ausgabe des Bestimmtheitsmaß:
+```python
+from sklearn.metrics import r2_score
+
+y_pred = model.predict(X.astype(np.float32))
+
+print(r2_score(y, y_pred))
+
+0.8493171091838858
+```
+
+## Die Aktivierungsfunktion
+
