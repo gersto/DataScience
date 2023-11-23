@@ -198,4 +198,8 @@ array([[74.41793]], dtype=float32)
 Das einzelne Neuron hat zwar gelernt, aber noch nicht so richtig gut:
 - bis jetzt nur über eine Epoche trainiert (wir legen dem Neuron alle Daten vor und drehen dann
   an den Gewichten - dieses ansehen der Daten und drehen der Gewichte sollte mehrfach erfolgen) --> epochs-Paramter ändern
-  
+  ```python
+  model.fit(X.astype(np.float32), y, batch_size = 1, epochs = 10)
+  ```
+  dauert sehr lange, ist also relativ ineffizient
+- Änderung der batch_size 
