@@ -183,7 +183,7 @@ Das folgende fitten dauert einige Zeit
 model.fit(X.astype(np.float32), y, batch_size = 1, epochs = 1)
 
 53940/53940 [==============================] - 56s 1ms/step - loss: 30607938.0000
-<tensorflow.python.keras.callbacks.History at 0x7fd784452590>
+<tensorflow.psython.kera.callbacks.History at 0x7fd784452590>
 ```
 
 Danach kann man wieder ein predict durchführen
@@ -194,3 +194,8 @@ model.predict(np.array([
 
 array([[74.41793]], dtype=float32)
 ```
+
+Das einzelne Neuron hat zwar gelernt, aber noch nicht so richtig gut:
+- bis jetzt nur über eine Epoche trainiert (wir legen dem Neuron alle Daten vor und drehen dann
+  an den Gewichten - dieses ansehen der Daten und drehen der Gewichte sollte mehrfach erfolgen) --> epochs-Paramter ändern
+  
