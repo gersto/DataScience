@@ -238,3 +238,84 @@ print(r2_score(y, y_pred))
 
 ## Die Aktivierungsfunktion
 
+Idee ist ähnlich der logistischen Regression:
+- Damit das Neuron eine Ausgabe zwischen 0 und 1 ausgibt, wird die Ausgabe durch eine Aktivierungsfunktion geleitet
+- Dadurch können wir eine Klassifizierung durchführen (ja/nein Anwort)
+- Dies wird aber später auch noch wichtig sein, um mehrere Neuronen hintereinander schalten zu können ("Neuronales Netz") - dort zwingend notwendig
+
+![NeuronaleNetze04](pictures/NeuronaleNetze04.jpg)
+
+- Unser Neuron führt jetzt eine Klassifizierung durch (Ja/Nein)
+- Aber:
+  - Das Trainieren würde so noch recht lange dauern / nicht richtig funktionieren
+  - Wir benötigen noch eine andere Loss-Funktion!
+  - die sogenannte BinaryCrossentropy!
+
+Aktivierungsfunktion im Code mit Diabetesdaten:
+
+```python
+# Matplotlib config
+%matplotlib inline
+%config InlineBackend.figure_formats = ['svg']
+%config InlineBackend.rc = {'figure.figsize': (5.0, 3.0)}
+
+import numpy as np
+import pandas as pd
+import seaborn as sns
+
+df = pd.read_csv("../data/Diabetes/diabetes.csv")
+df.head()
+```
+
+Auf Basis des BMI und des Alters möchte man die Wahrscheinlichkeit (Outcome) für Diabetes schätzen
+```python
+X = df[["BMI", "Age"]]
+y = df["Outcome"]
+```
+
+Man könnte auch noch train_test_split ausführen - hier nicht<br>
+Wichtig ist der activation-Parameter in layers.Dense auf sigmoid zu setzen (standardmäßig auf linear)
+```python
+# Tensorflow laden
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
+
+model = keras.Sequential([
+    layers.Dense(1, name = "neuron", activation = "sigmoid")
+])
+
+model.compile(
+    optimizer = keras.optimizers.RMSprop(0.01),
+    loss = keras.losses.BinaryCrossentropy()
+)
+
+model.fit(X.astype(np.float32), y, batch_size = 64, epochs = 100)
+```
+```python
+model.predict(X)
+```
+Umwandlung in True/False-Werte (Wahrscheinlichkeiten > 0.5
+
+```python
+#(model.predict(X) > 0.5).shape
+#y.to_numpy().shape
+#(model.predict(X) > 0.5).ravel().shape
+# reshape(-1) entspricht dem ravel()
+#(model.predict(X) > 0.5).reshape(-1).shape
+
+np.mean((model.predict(X) > 0.5).ravel() == y)
+
+0.6627604166666666  --> entspricht einer Genauigkeit von 66%
+```
+
+```python
+model.predict(np.array([
+    [25, 30]
+]))
+
+array([[0.24642956]], dtype=float32)
+```
+
+
+
