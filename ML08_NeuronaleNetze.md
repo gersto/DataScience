@@ -317,7 +317,7 @@ model.predict(np.array([
 array([[0.24642956]], dtype=float32)
 ```
 
-# Neuronale Netze (vom Neuron zm Netz)
+# Neuronale Netze (vom Neuron zum Netz)
 
 ## Vom Neuron zum Netz (Backpropagation)
 
@@ -330,5 +330,115 @@ array([[0.24642956]], dtype=float32)
   - Output-Layer
  
 ![NeuronaleNetze05](pictures/NeuronaleNetze05.jpg)
+
+Das obige Bild enthält die Eingabeschicht mit den Xi-Werten, die Ausgabeschicht mit einem
+Neuron und einen Hidden-Layer mit 3 Neuronen. Jedes Neuron ist mit der vorherigen Schicht komplett
+verbunden. Mit einem entsprechend großen Hidden-Layer kann man jeglich komplexe Aufgabestellungen
+(z.B. Bilderkennungen) lösen.
+
+- Problem
+  - Aber wie lernen wir jetzt die Gewichte?
+  - Hier kommt jetzt "Deep Learning" ins Spiel... wie lernt jetzt unser Hiddel-Layer?
+  - Idee:
+    - Backpropagation
+    - Wir führen den Fehler der Neuronen des Hidden-Layers auf den Ausgabefehler zurück
+   
+Vorgangsweise:
+- Zuerst werden die Gewichte zufällige gewählt
+- danach führen wir eine "Forward-Propagation" (alle Multiplikationen und Aktivierungsfunktionen) aus
+- daraus ergibt sich ein Fehler (e = y_dach - y)
+- mit Hilfe des Fehlers berechnen wir wieder die Gewichte (Backward-Propagation / Backprop)
+
+![NeuronaleNetze06](pictures/NeuronaleNetze06.jpg)
+
+## Vom Neuron zum Netz
+
+```python
+# Matplotlib config
+%matplotlib inline
+%config InlineBackend.figure_formats = ['svg']
+%config InlineBackend.rc = {'figure.figsize': (5.0, 3.0)}
+
+import numpy as np
+import pandas as pd
+import seaborn as sns
+
+df = pd.read_csv("../data/Diabetes/diabetes.csv")
+df.head()
+```
+
+```python
+# Tensorflow laden
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
+
+model = keras.Sequential([
+    layers.Dense(3, name = "hidden", activation = "sigmoid"),
+    layers.Dense(1, name = "neuron", activation = "sigmoid")
+])
+
+model.compile(
+    optimizer = keras.optimizers.RMSprop(0.01),
+    loss = keras.losses.BinaryCrossentropy()
+)
+
+model.fit(X.astype(np.float32), y, batch_size = 64, epochs = 3)
+```
+
+```python
+print(model.summary())
+```
+
+Um die model.summary()-Information schon nach der model-Bildung ausgeben zu können, kann man noch einen
+zusätzlichen Parameter erweitern.
+```python
+# Tensorflow laden
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
+
+model = keras.Sequential([
+    keras.Input(shape = (2,)),
+    # layers.Dense(3, name = "hidden", activation = "sigmoid", input_shape = (2,)),
+    layers.Dense(3, name = "hidden", activation = "sigmoid"),
+    layers.Dense(1, name = "neuron", activation = "sigmoid")
+])
+
+print(model.summary())
+```
+```python
+model.compile(
+    optimizer = keras.optimizers.RMSprop(0.01),
+    loss = keras.losses.BinaryCrossentropy()
+)
+
+model.fit(X.astype(np.float32), y, batch_size = 64, epochs = 50)
+```
+```python
+np.mean((model.predict(X) > 0.5).ravel() == y)
+
+0.6692708333333334
+```
+
+Man kann aber auch mit viel mehr Hidden-Layer-Neuronen (z.B. 1024) arbeiten
+```python
+# Tensorflow laden
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
+
+model = keras.Sequential([
+    keras.Input(shape = (2,)),
+    layers.Dense(1024, name = "hidden", activation = "sigmoid"),
+    layers.Dense(1, name = "neuron", activation = "sigmoid")
+])
+
+print(model.summary())
+```
+
+## Warum Aktivierungsfunktion
+
+
 
 
