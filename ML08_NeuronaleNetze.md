@@ -175,6 +175,8 @@ Wir sehen uns mal die X-Daten an
 #print(X)
 #print(X.to_numpy())
 print(X.to_numpy().dtype)
+
+float64
 ```
 
 Neuronales Netz will mit float32 rechnen -> schneller<br>
@@ -338,7 +340,7 @@ verbunden. Mit einem entsprechend großen Hidden-Layer kann man jeglich komplexe
 
 - Problem
   - Aber wie lernen wir jetzt die Gewichte?
-  - Hier kommt jetzt "Deep Learning" ins Spiel... wie lernt jetzt unser Hiddel-Layer?
+  - Hier kommt jetzt "Deep Learning" ins Spiel... wie lernt jetzt unser Hidden-Layer?
   - Idee:
     - Backpropagation
     - Wir führen den Fehler der Neuronen des Hidden-Layers auf den Ausgabefehler zurück
@@ -439,6 +441,102 @@ print(model.summary())
 
 ## Warum Aktivierungsfunktion
 
+Die folgenden Codebeispiele sollen zeigen warum ist es so wichtig, dess der Hidden-Layer eine Aktivierungsfunktion enthält.
 
+```python
+# X => Neuron 1 => Neuron 2 => Ausgabe
+X = 4
+X * 4 * 2
 
+32
+```
+
+```python
+# X => Neuron 1 => Ausgabe
+X = 4
+X * 8
+
+32
+```
+
+```python
+def S(x):
+    return 1 / (1 + np.exp(-x))
+```
+
+```python
+# X => Neuron 1 (linear) => Neuron 2 (sigmoid) => Ausgabe
+X = 4
+S(X * 4 * 2)
+
+0.9999999999999873
+```
+
+```python
+# X => Neuron 1 (sigmoid) => Ausgabe
+X = 4
+S(X * 8)
+
+0.9999999999999873
+```
+
+```python
+# X => Neuron 1 (sigmoid) => Neuron 2 (sigmoid) => Ausgabe
+X = 4
+S(S(X * 4) * 2)
+
+0.8807970543469401
+```
+
+## Die RELU-Aktivierungsfunktion
+
+Bis jetzt wurde im Hidden-Layer eine sigmoid-Aktivierungsfunktion verwendet. Es gibt
+aber auch noch andere Aktivierungsfunktionen
+
+```python
+# Matplotlib config
+%matplotlib inline
+%config InlineBackend.figure_formats = ['svg']
+%config InlineBackend.rc = {'figure.figsize': (5.0, 3.0)}
+
+import numpy as np
+import pandas as pd
+import seaborn as sns
+
+# Aktivierungsfunktion: sigmoid
+def S(x):
+    return 1 / (1 + np.exp(-x))
+
+def relu(x):
+    return np.maximum(0, x)
+```
+
+Die sigmoid-Aktivierungsfunktion hat die Eigenschaft immer Werte zwischen 0 und 1 zu liefern.
+Dies ist für den Ausgabelayer bei dem Beispiel mit der Diabeteserkennung für den Ausgabelayer gewünscht.<br>
+Für den Hidden-Layer brauchen wir diese Eigenschaft nicht
+
+```python
+xs = np.arange(-5, 5, 0.1)
+ys = S(xs)
+
+sns.lineplot(x = xs, y = ys);
+```
+![NeuronaleNetze07](pictures/NeuronaleNetze07.jpg)
+
+Das Problem bei der Sigmoid-Funktion ist auch, dass man das komplette ausschalten eines Neurons nicht
+möglich ist. Weiters ist die Sigmoid-Funktion an den Enden sehr, sehr flach -> dadurch ist die Lernrate sehr gering
+
+Was will man normalerweise mit den Hidden-Layer --> primär soll dadurch die Linearität gebrochen werden.<br>
+Dies kann man schon durch die einfach RELU-Funktion erreichen (im Positiven eine lineare Funktion, im negative Null)
+
+```python
+xs = np.arange(-5, 5, 0.1)
+ys = relu(xs)
+
+sns.lineplot(x = xs, y = ys);
+```
+![NeuronaleNetze08](pictures/NeuronaleNetze08.jpg)
+
+Z.B. könnte sich dadurch ein Neuron, welches bei jungen Personen negative Werte gelernt hat, komplett ausschalten. Oder
+ein Neuron, welches einen niedrigen BMI liefert auch entsprechend ausschalten
 
