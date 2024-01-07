@@ -540,3 +540,147 @@ sns.lineplot(x = xs, y = ys);
 Z.B. könnte sich dadurch ein Neuron, welches bei jungen Personen negative Werte gelernt hat, komplett ausschalten. Oder
 ein Neuron, welches einen niedrigen BMI liefert auch entsprechend ausschalten
 
+## RELU anwenden
+
+Wir verwenden wieder die Diabetesdaten, nehmen aber mehr Spalten auf.
+
+```python
+df = pd.read_csv("../data/Diabetes/diabetes.csv")
+
+X = df[["BMI", "Age", "Glucose", "BloodPressure", "SkinThickness", "Insulin"]]
+y = df["Outcome"]
+```
+
+Das Modell hat jetzt 6 Eingabedaten mit einer "relu"-Aktivierungsfunktion im Hidden-Layer und z.B. 128 Neuronen<br>
+Tendentiell liefert die relu-Funktion bessere Ergebnisse als die sigmoid-Funktion im Hidden-Layer
+
+```python
+# Tensorflow laden
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
+
+model = keras.Sequential([
+    keras.Input(shape = (6,)),
+    layers.Dense(128, name = "hidden1", activation = "relu"),
+    layers.Dense(1, name = "neuron", activation = "sigmoid")
+])
+
+print(model.summary())
+
+Model: "sequential"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #   
+=================================================================
+ hidden1 (Dense)             (None, 128)               896                                                                       
+ neuron (Dense)              (None, 1)                 129                                                                       
+=================================================================
+Total params: 1025 (4.00 KB)
+Trainable params: 1025 (4.00 KB)
+Non-trainable params: 0 (0.00 Byte)
+_________________________________________________________________
+None
+```
+
+Jetzt trainieren wir das Modell mit den Daten (auf den loss achten
+
+```python
+model.compile(
+    optimizer = keras.optimizers.RMSprop(0.01),
+    loss = keras.losses.BinaryCrossentropy()
+)
+
+model.fit(X.astype(np.float32), y, batch_size = 64, epochs = 100)
+```
+
+```python
+np.mean((model.predict(X) > 0.5).ravel() == y)
+
+0.7408854166666666
+```
+
+Eventuell mit der sigmoid-Aktivierungsfunktion im Hidden-Layer testen und vergleichen!!!
+
+## Die MNIST-Daten
+
+Die Stärken eines Neuronalen-Netzwerks liegen oft bei komplexen Daten (z.B. Bilderkennung) 
+
+Im folgenden werden wir mit Hilfe der MNIST-Daten eine Ziffernerkennung entwicken.
+
+```python
+# Matplotlib config
+%matplotlib inline
+%config InlineBackend.figure_formats = ['svg']
+%config InlineBackend.rc = {'figure.figsize': (5.0, 3.0)}
+
+import numpy as np
+import pandas as pd
+import seaborn as sns
+
+import gzip
+import numpy as np
+
+# Code aufbauend auf: https://stackoverflow.com/a/62781370
+def load_images(path):
+    with gzip.open(path, 'r') as f:
+        # first 4 bytes is a magic number
+        magic_number = int.from_bytes(f.read(4), 'big')
+        # second 4 bytes is the number of images
+        image_count = int.from_bytes(f.read(4), 'big')
+        # third 4 bytes is the row count
+        row_count = int.from_bytes(f.read(4), 'big')
+        # fourth 4 bytes is the column count
+        column_count = int.from_bytes(f.read(4), 'big')
+        # rest is the image pixel data, each pixel is stored as an unsigned byte
+        # pixel values are 0 to 255
+        image_data = f.read()
+        images = np.frombuffer(image_data, dtype=np.uint8)\
+            .reshape((image_count, row_count, column_count))
+        return images
+    
+def load_labels(path):
+    with gzip.open(path, 'r') as f:
+        # first 4 bytes is a magic number
+        magic_number = int.from_bytes(f.read(4), 'big')
+        # second 4 bytes is the number of labels
+        label_count = int.from_bytes(f.read(4), 'big')
+        # rest is the label data, each label is stored as unsigned byte
+        # label values are 0 to 9
+        label_data = f.read()
+        labels = np.frombuffer(label_data, dtype=np.uint8)
+        return labels
+
+X_train = load_images("data/MNIST/train-images-idx3-ubyte.gz")
+y_train = load_labels("data/MNIST/train-labels-idx1-ubyte.gz")
+
+X_test = load_images("data/MNIST/t10k-images-idx3-ubyte.gz")
+y_test = load_labels("data/MNIST/t10k-labels-idx1-ubyte.gz")
+```
+
+```python
+print(X_train.shape)
+(60000, 28, 28)
+
+print(X_train[0, :, :])
+```
+
+Visualisieren der Daten mithilfe von matplotlib
+
+
+```python
+import matplotlib.pyplot as plt
+
+plt.imshow(X_train[0, :, :])
+plt.show()
+```
+
+Aufbau der Y-daten
+```python
+print(Y_train.shape)
+(60000,)
+
+print(Y_train[0])
+5
+```
+
+Die Bilder sind als Graustufen gespeichert (werden in matplotlib aber färbig dargestellt)
