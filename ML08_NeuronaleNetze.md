@@ -684,3 +684,174 @@ print(Y_train[0])
 ```
 
 Die Bilder sind als Graustufen gespeichert (werden in matplotlib aber färbig dargestellt)
+
+## Neuronales Netz (MNIST)
+
+Nun geht es darum mit den MNIST-Daten ein neuronales Netz zu trainieren
+
+Wir haben jetzt noch ein Problem mit den X-Daten. Die Daten haben 3 Dimensionen, aber beim Modell werden nur 2 Dimensionen benötigt
+
+```python
+print(X_train.shape)
+(60000, 28, 28)
+
+np.array([
+  [0, 0, 0, 0, 0]
+]).shape
+(1, 5)
+```
+
+Wir wandeln die Daten um - erste Dimension bleibt gleich und jeder Eintrag besteht aus 784 Spalten
+```python
+print(28 * 28)
+784
+
+X_train.reshape(-1, 784).shape
+(60000, 784)
+```
+
+```python
+X_train = load_images("data/MNIST/train-images-idx3-ubyte.gz")
+y_train = load_labels("data/MNIST/train-labels-idx1-ubyte.gz")
+
+X_test = load_images("data/MNIST/t10k-images-idx3-ubyte.gz")
+y_test = load_labels("data/MNIST/t10k-labels-idx1-ubyte.gz")
+
+X_train = X_train.reshape(-1, 784)
+X_test = X_test.reshape(-1, 784)
+
+y_train = y_train == 5
+y_test = y_test == 5
+```
+
+Zum Ausgeben in matplotlib muss wieder zurück-geshaped werden
+```python
+import matplotlib.pyplot as plt
+
+plt.imshow(X_train[0, :].reshape(28, 28))
+plt.show()
+```
+
+Auch bei den y-Daten gibt es noch ein Problem
+```python
+y_train = y_train == 5
+y_test = y_test == 5
+```
+
+```python
+# Tensorflow laden
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
+
+
+model = keras.Sequential([
+    keras.Input(shape = (784,)),
+    layers.Dense(1024, activation = "relu"),
+    layers.Dense(1, activation = "sigmoid")
+])
+
+print(model.summary())
+
+model.compile(
+    optimizer = keras.optimizers.RMSprop(),
+    loss = keras.losses.BinaryCrossentropy()
+)
+
+# Umwandlung in float32 ist notwendig, da die Daten keine float-Zahlen, sondern integer-Zahlen sind
+model.fit(X_train.astype(np.float32), y_train, batch_size = 64, epochs = 50)
+```
+
+```python
+np.mean((model.predict(X_test.astype(np.float32)) > 0.5) == y_test)
+
+# Es wird mit einer Wahrscheinlichleit von 83% erkannt, dass es sich um die Zahl 5 handelt
+0.8384992
+```
+
+## Neuronales Netz mit mehreren Ausgängen (MNIST)
+
+bis jetzt haben wir nur einen Ausgang gehabt (z.B. ob auf dem Bild eine 5 zu sehen ist oder nicht).
+Idee ist statt einen Neuron als Ausgang gleich 10 Neuronen gleichzeitig.
+
+Daher müssen die y-Daten angepasst werden. Zum Kategorisieren gibt es eine eigene Funktion (to_categorical)
+
+```python
+X_train = load_images("data/MNIST/train-images-idx3-ubyte.gz")
+y_train = load_labels("data/MNIST/train-labels-idx1-ubyte.gz")
+
+X_test = load_images("data/MNIST/t10k-images-idx3-ubyte.gz")
+y_test = load_labels("data/MNIST/t10k-labels-idx1-ubyte.gz")
+
+X_train = X_train.reshape(-1, 784)
+X_test = X_test.reshape(-1, 784)
+
+# print(y_train)
+from tensorflow.keras.utils import to_categorical
+y_train = to_categorical(y_train)
+# print(y_train.shape)
+# (60000, 10)
+y_test = to_categorical(y_test)
+```
+
+```python
+# Tensorflow laden
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
+
+model = keras.Sequential([
+    keras.Input(shape = (784,)),
+    layers.Dense(1024, activation = "relu"),
+    layers.Dense(10, activation = "sigmoid")
+])
+
+print(model.summary())
+
+model.compile(
+    optimizer = keras.optimizers.RMSprop(),
+    loss = keras.losses.BinaryCrossentropy()
+)
+
+model.fit(X_train.astype(np.float32), y_train, batch_size = 64, epochs = 10)
+```
+
+Für eine entspechende Zahl:
+```python
+model.predict(X_test.astype(np.float32))
+
+model.predict(X_test.astype(np.float32)).shape
+(10000, 10)
+
+model.predict(X_test.astype(np.float32))[0, :]
+array([0., 0., 0., 0., 0., 0., 0., 1., 0., 0.], dtype=float32)
+```
+
+Um die entsprechende Zahl zu ermitteln
+```python
+np.argmax([0., 0., 0., 0., 0., 0., 0., 1., 0., 0.])
+7
+```
+
+Um die entsprechende Zahl auszugeben
+```python
+import matplotlib.pyplot
+
+plt.imshow(X_test[0, :].reshape(28, 28))
+plt.show()
+```
+
+Um dies für alle Zahlen vorherzusagen
+```python
+y_test_pred = model.predict(X_test.astype(np.float32))
+
+print(np.mean(np.argmax(y_test_pred, axis = 1) == y_test))
+0.9795
+```
+
+## Was ist Softmax?
+
+```python
+
+```
+
